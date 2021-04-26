@@ -18,6 +18,8 @@ import com.example.my_time_table.database.TimeTableDatabase;
 
 public class ScheduleFragment2 extends Fragment {
 
+    private static RecyclerView recyclerView;
+
     public ScheduleFragment2() {
     }
 
@@ -38,10 +40,14 @@ public class ScheduleFragment2 extends Fragment {
         // Устанавливаем адаптер.
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new RecyclerAdapter(ttb.timeTableDao().LoadAllPartOfTimeTable()));
+            recyclerView.setAdapter(new RecyclerAdapter(null, ttb.timeTableDao().LoadAllTimeTableWeek2()));
         }
         return view;
+    }
+
+    public static RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 }

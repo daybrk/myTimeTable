@@ -19,15 +19,18 @@ import com.example.my_time_table.fragments.ScheduleFragment;
 import com.example.my_time_table.fragments.ScheduleFragment2;
 import com.example.my_time_table.time_table_pojos.CheckDay;
 import com.example.my_time_table.time_table_pojos.PartOfTimeTable;
+import com.example.my_time_table.time_table_pojos.TimeTableWeek2;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     static ViewPager2 viewPager2;
     private static TextView weeklyNumber;
+    private TextView numberDay;
+    private static TextView weekDay;
 
     static FirebaseDatabase mDataBase;
     static DatabaseReference ref;
@@ -51,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
     // Хранит все рабочие дни
     static String[] daysWeek = new String[] {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
     // Список для хранения индексов "нового" дня
-    public static ArrayList<Integer> nextDay = new ArrayList<>();
+    public static ArrayList<Integer> nextDay1 = new ArrayList<>();
+
+    public static ArrayList<Integer> nextDay2 = new ArrayList<>();
     // Индекс "нового" дня
     static int day;
     // Экземпляр Базы данных
@@ -65,13 +72,6 @@ public class MainActivity extends AppCompatActivity {
         //
         init();
 
-        //TODO: доделать определение текущего дня недели
-
-        // Calendar c = Calendar.getInstance();
-        // c.setFirstDayOfWeek(Calendar.MONDAY);
-        // Log.i("DAY", String.valueOf(c.getFirstDayOfWeek()));
-        // dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - 2;
-        // Log.i("DAYS", String.valueOf(dayOfWeek));
     }
 
     void init() {
@@ -83,9 +83,46 @@ public class MainActivity extends AppCompatActivity {
         // Инициализируем переменные
         viewPager2 = (ViewPager2) findViewById(R.id.viewpager);
         weeklyNumber = (TextView) findViewById(R.id.weekly_number);
-
+        numberDay = (TextView) findViewById(R.id.number_day);
+        weekDay = (TextView) findViewById(R.id.weekday);
         // Устанавливаем номер начальное недели
         weeklyNumber.setText("1");
+
+        // Текущее время
+        Date currentDate = new Date();
+        // Форматирование времени как "день.месяц.год" и дня недели
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEЕ");
+        setTextWeekDay(sdf, currentDate, dateFormat);
+    }
+
+    void setTextWeekDay(SimpleDateFormat sdf, Date currentDate, DateFormat dateFormat) {
+
+        numberDay.setText(dateFormat.format(currentDate));
+
+        switch (sdf.format(currentDate)) {
+            case "понедельник":
+                weekDay.setText("Понедельник");
+                break;
+            case "вторник":
+                weekDay.setText("Вторник");
+                break;
+            case "среда":
+                weekDay.setText("Среда");
+                break;
+            case "четверг":
+                weekDay.setText("Четверг");
+                break;
+            case "пятница":
+                weekDay.setText("Пятница");
+                break;
+            case "суббота":
+                weekDay.setText("Суббота");
+                break;
+            case "воскресенье":
+                weekDay.setText("Воскресенье");
+                break;
+        }
     }
 
     @Override
@@ -94,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         // Получаем значение версии room ДБ, если её нет (первый запуск), то version = 0
         version = sharedPreferences.getFloat("Version", 0);
 
-        // Log.i("Version", "Значение переменной в onStart " + version);
+         Log.i("Version", "Значение переменной в onStart " + version);
 
         // Инициализируем переменные и задаём начальный путь для ref
         ttb = TimeTableDatabase.getDatabase(getApplicationContext());
@@ -132,11 +169,21 @@ public class MainActivity extends AppCompatActivity {
                 if (Double.parseDouble(String.valueOf(dataSnapshot.child("/Version")
                         .getValue())) == version) {
                     // Добавляем в nextDay первый индекс "нового" дня который всегда по умолчанию =  0
-                    nextDay.add(0);
+                    nextDay1.add(0);
+                    nextDay2.add(0);
                     // Получаем из room БД все значения "нового" дня и записываем их в список
-                    for (int i = 0; i < ttb.timeTableDao().LoadAllDaysNumber().size(); i++) {
-                        nextDay.add(ttb.timeTableDao().LoadAllDaysNumber().get(i).getNum());
+                    int i = 0;
+                    while (ttb.timeTableDao().LoadAllDaysNumber().get(i).getNum() != 999) {
+                        nextDay1.add(ttb.timeTableDao().LoadAllDaysNumber().get(i).getNum());
+                        i++;
                     }
+
+                    i++;
+                    while (i != ttb.timeTableDao().LoadAllDaysNumber().size()) {
+                        nextDay2.add(ttb.timeTableDao().LoadAllDaysNumber().get(i).getNum());
+                        i++;
+                    }
+
                 } else {
                     // Сохраняем значение версии БД
                     version = (float) Double.parseDouble(String.valueOf(dataSnapshot.child("/Version").getValue()));
@@ -144,47 +191,67 @@ public class MainActivity extends AppCompatActivity {
                     // Log.i("Version", "Значение переменной обновляется " + version);
 
                     // Добавляем в nextDay первый индекс "нового" дня который всегда по умолчанию =  0
-                    nextDay.add(0);
-                    for (String s : daysWeek) {
-                        DataSnapshot ds = dataSnapshot.child("/Week" + "/" + weeklyNumber.getText() + "/Days" + "/" + s + "/Sub");
-                        for (DataSnapshot ds1 : ds.getChildren()) {
-                            for (DataSnapshot ds2 : ds1.getChildren()) {
-                                // Создаём новую сущность
-                                PartOfTimeTable part = new PartOfTimeTable();
-                                // Задаём ей номер недели
-                                part.setWeek(String.valueOf(weeklyNumber.getText()));
-                                // Задаём ей день
-                                part.setDay(s);
-                                // Задаём ей название предмета
-                                part.setSubject(ds2.getKey());
-                                // Задаём ей номер аудитории
-                                part.setAudience(String.valueOf(ds2.child("Aud").getValue()));
-                                // Задаём ей подгруппу
-                                part.setSubGroup(String.valueOf(ds2.child("SubGroup").getValue()));
-                                // Задаём ей преподователя
-                                part.setTeacher(String.valueOf(ds2.child("Teach").getValue()));
-                                // Задаём ей временной промежуток
-                                part.setClassHour(String.valueOf(ds2.child("Time").getValue()));
-                                // Задаём ей тип предмета
-                                part.setType(String.valueOf(ds2.child("Type").getValue()));
-                                // Добавляем сущность в БД
-                                ttb.timeTableDao().insertPartOfTimeTable(part);
-                                // Ищем индекс "нового" дня для добавления в БД/Списка
-                                day++;
+                    nextDay1.add(0);
+                    nextDay2.add(0);
+
+                    for (int i = 1; i < 3; i++) {
+                        DataSnapshot ds0 = dataSnapshot.child("/Week" + "/" + i);
+                        for (String s : daysWeek) {
+                            DataSnapshot ds;
+                            if (i == 1) {
+                                if (ds0.child("/Days" + "/" + s + "/Sub").getValue() == null) {
+                                    continue;
+                                }else {
+                                    ds = ds0.child("/Days" + "/" + s + "/Sub");
+                                }
+                            } else {
+                                if (ds0.child("/" + s + "/Sub").getValue() == null) {
+                                    continue;
+                                }else {
+                                    ds = ds0.child("/" + s + "/Sub");
+                                }
                             }
+
+                            for (DataSnapshot ds1 : ds.getChildren()) {
+                                for (DataSnapshot ds2 : ds1.getChildren()) {
+                                    // Создаём новую сущность
+                                    addDataToRoomDB(ds2, new PartOfTimeTable(),
+                                            new TimeTableWeek2(), s, i);
+                                    // Ищем индекс "нового" дня для добавления в БД/Списка
+                                    day++;
+//                                    Log.i("nextDay", "в цикле " + String.valueOf(day));
+                                }
+                            }
+
+                            // Создаём новую сущность для хранения индекса,
+                            // в котором начинается новый день в расписании для дальнейшего использование
+                            // при отсутсвии изменений в БД
+                            CheckDay checkDay = new CheckDay();
+                            // Задаём этот самый индекс "нового" дня
+                            checkDay.setNum(day);
+                            // Добавляем сущность в БД
+                            ttb.timeTableDao().insertDaysNumber(checkDay);
+                            if (i == 1) {
+//                                Log.i("nextDay", "добавление в лист " + String.valueOf(day));
+                                nextDay1.add(day);
+                            } else {
+                                nextDay2.add(day);
+                            }
+//                            Log.i("nextDay", "новая иттерация " + String.valueOf(day));
                         }
 
-                        // Создаём новую сущность для хранения индекса,
-                        // в котором начинается новый день в расписании для дальнейшего использование
-                        // при отсутсвии изменений в БД
-                        CheckDay checkDay = new CheckDay();
-                        // Задаём этот самый индекс "нового" дня
-                        checkDay.setNum(day);
-                        // Добавляем сущность в БД
-                        ttb.timeTableDao().insertDaysNumber(checkDay);
+                        if (i == 1) {
+                            ttb.timeTableDao().delete(ttb.timeTableDao().getByIdDay(ttb.timeTableDao().LoadAllDaysNumber().size()));
+                            nextDay1.remove(nextDay1.size() - 1);
+                            CheckDay checkDay = new CheckDay();
+                            checkDay.setNum(999);
+                            ttb.timeTableDao().insertDaysNumber(checkDay);
 
-                        nextDay.add(day);
+                            day = 0;
+                        }
                     }
+                    ttb.timeTableDao().delete(ttb.timeTableDao().getByIdDay(ttb.timeTableDao().LoadAllDaysNumber().size()));
+                    nextDay2.remove(nextDay2.size() - 1);
                 }
                 // Устанавливаем ScreenSlidePagerAdapter и создаём фрагменты.
                 createScreenSlide();
@@ -196,6 +263,50 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         ref.addValueEventListener(vListener);
+    }
+
+    static void addDataToRoomDB(DataSnapshot ds2, PartOfTimeTable part, TimeTableWeek2 week2, String s, int i) {
+
+        if (i == 1) {
+            // Задаём ей номер недели
+            part.setWeek(String.valueOf(i));
+            // Задаём ей день
+            part.setDay(s);
+            // Задаём ей название предмета
+            part.setSubject(ds2.getKey());
+            // Задаём ей номер аудитории
+            part.setAudience(String.valueOf(ds2.child("Aud").getValue()));
+            // Задаём ей подгруппу
+            part.setSubGroup(String.valueOf(ds2.child("SubGroup").getValue()));
+            // Задаём ей преподователя
+            part.setTeacher(String.valueOf(ds2.child("Teach").getValue()));
+            // Задаём ей временной промежуток
+            part.setClassHour(String.valueOf(ds2.child("Time").getValue()));
+            // Задаём ей тип предмета
+            part.setType(String.valueOf(ds2.child("Type").getValue()));
+            // Добавляем сущность в БД
+            ttb.timeTableDao().insertPartOfTimeTable(part);
+        } else if (i == 2) {
+            // Задаём ей номер недели
+            week2.setWeek(String.valueOf(i));
+            // Задаём ей день
+            week2.setDay(s);
+            // Задаём ей название предмета
+            week2.setSubject(ds2.getKey());
+            // Задаём ей номер аудитории
+            week2.setAudience(String.valueOf(ds2.child("Aud").getValue()));
+            // Задаём ей подгруппу
+            week2.setSubGroup(String.valueOf(ds2.child("SubGroup").getValue()));
+            // Задаём ей преподователя
+            week2.setTeacher(String.valueOf(ds2.child("Teach").getValue()));
+            // Задаём ей временной промежуток
+            week2.setClassHour(String.valueOf(ds2.child("Time").getValue()));
+            // Задаём ей тип предмета
+            week2.setType(String.valueOf(ds2.child("Type").getValue()));
+            // Добавляем сущность в БД
+            ttb.timeTableDao().insertTimeTableWeek2(week2);
+        }
+
     }
 
     private static class ScreenSlidePagerAdapter extends FragmentStateAdapter {
@@ -221,33 +332,28 @@ public class MainActivity extends AppCompatActivity {
         public long getItemId ( int position) {
             switch (position) {
                 case 0:
-                case 1:
                     try {
-                        //TODO: Доделать автопролистывание
 
                         // Автопролистывание
-//                        ScheduleFragment.recyclerView.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                int d;
-//                                try {
-//                                    // В зависимости от дня недели получаем id нужного элемента.
-//                                    d = ScheduleData.numbers[(dayOfWeek) + 1] - 1;
-//                                } catch (ArrayIndexOutOfBoundsException e) {
-//                                    d = ScheduleData.ITEMS.size() - 1;
-//                                }
-//                                if (d != 0) {
-//                                    // TODO: НУЖНО ЛИ?
-////                                    d = Integer.parseInt(ScheduleData.ITEMS.get(d).id);
-////                                    // Используем auto-scroll к нужному элементу.
-////                                    ScheduleFragment.recyclerView.smoothScrollToPosition(d);
-//                                }
-//                            }
-//                        });
+                        ScheduleFragment.getRecyclerView().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (int i = 1; i < nextDay1.size(); i++) {
+                                    if (weekDay.getText()
+                                            .equals(ttb.timeTableDao()
+                                                    .getById1Week(nextDay1.get(i) + 1).getDay())) {
+                                        ScheduleFragment.getRecyclerView()
+                                                .smoothScrollToPosition(nextDay1.get(i) + 2);
+                                    }
+                                }
+                            }
+                        });
                     } catch (Exception ignore) {
 
                     }
+                    weeklyNumber.setText(String.valueOf(position + 1));
 
+                case 1:
                     // С пролистыванием, меняем значение недели.
                     weeklyNumber.setText(String.valueOf(position + 1));
                     break;

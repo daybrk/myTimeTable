@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,12 @@ import android.view.ViewGroup;
 import com.example.my_time_table.MainActivity;
 import com.example.my_time_table.R;
 import com.example.my_time_table.RecyclerAdapter;
-import com.example.my_time_table.database.TimeTableDAO;
 import com.example.my_time_table.database.TimeTableDatabase;
 
 public class ScheduleFragment extends Fragment {
 
+
+    private static RecyclerView recyclerView;
 
     public ScheduleFragment() {
     }
@@ -41,11 +41,15 @@ public class ScheduleFragment extends Fragment {
         // Устанавливаем адаптер.
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new RecyclerAdapter(ttb.timeTableDao().LoadAllPartOfTimeTable()));
+            recyclerView.setAdapter(new RecyclerAdapter(ttb.timeTableDao().LoadAllPartOfTimeTable(), null));
 //            MainActivity.scrollToItem();
         }
         return view;
+    }
+
+    public static RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 }

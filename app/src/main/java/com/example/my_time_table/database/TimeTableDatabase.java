@@ -8,11 +8,12 @@ import androidx.room.RoomDatabase;
 
 import com.example.my_time_table.time_table_pojos.CheckDay;
 import com.example.my_time_table.time_table_pojos.PartOfTimeTable;
+import com.example.my_time_table.time_table_pojos.TimeTableWeek2;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {PartOfTimeTable.class, CheckDay.class}, version = 1,
+@Database(entities = {PartOfTimeTable.class, CheckDay.class, TimeTableWeek2.class}, version = 1,
         exportSchema = false)
 
 public abstract class TimeTableDatabase extends RoomDatabase {
