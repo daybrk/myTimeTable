@@ -6,10 +6,16 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "PartOfTimeTable")
 public class PartOfTimeTable {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id_Part;
 
     private String subject;
+
+    private String week;
+
+    private String type;
+
+    private String subGroup;
 
     private String teacher;
 
@@ -18,6 +24,22 @@ public class PartOfTimeTable {
     private String audience;
 
     private String day;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getSubGroup() {
+        return subGroup;
+    }
+
+    public void setSubGroup(String subGroup) {
+        this.subGroup = subGroup;
+    }
 
     public int getId_Part() {
         return id_Part;
@@ -74,7 +96,5 @@ public class PartOfTimeTable {
     public void setWeek(String week) {
         this.week = week;
     }
-
-    private String week;
 
 }
