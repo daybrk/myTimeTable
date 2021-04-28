@@ -21,7 +21,7 @@ public abstract class TimeTableDatabase extends RoomDatabase {
 
     private static volatile TimeTableDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
-    static final ExecutorService dbWriteExecutor =
+    public static final ExecutorService dbWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     public static TimeTableDatabase getDatabase(final Context context) {

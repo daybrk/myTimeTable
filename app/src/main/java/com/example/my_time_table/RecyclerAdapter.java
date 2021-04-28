@@ -3,7 +3,6 @@ package com.example.my_time_table;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +33,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     //TODO: Обновить view, добавить новые для разных ситуаций отображения.
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         // Подключаем нужный view, от полученного viewType переданного из метода getItemViewType.
         switch (viewType) {
@@ -60,6 +59,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         int type = getItemViewType(position);
+
         // В зависимости от type записываем в элементы ViewHolder нужную информацию.
         if (mValues2 == null) {
             switch (type) {
@@ -128,8 +128,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             // В цикле проверяем совпадает ли переменная position с каким-то из записанных значений в List
             // nextDay, если да то возвращаем второй тип view
-            for (int i = 0; i < MainActivity.nextDay1.size(); i++) {
-                if (MainActivity.nextDay1.get(i) == position) {
+            for (int i = 0; i < DataFromFB.getNextDay1().size(); i++) {
+                if (DataFromFB.getNextDay1().get(i) == position) {
                     return TYPE_ITEM2;
                 }
             }
@@ -145,8 +145,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             // В цикле проверяем совпадает ли переменная position с каким-то из записанных значений в List
             // nextDay, если да то возвращаем второй тип view
-            for (int i = 0; i < MainActivity.nextDay2.size(); i++) {
-                if (MainActivity.nextDay2.get(i) == position) {
+            for (int i = 0; i < DataFromFB.getNextDay2().size(); i++) {
+                if (DataFromFB.getNextDay2().get(i) == position) {
                     return TYPE_ITEM2;
                 }
             }
@@ -164,7 +164,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
 
     // View и его элементы.
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public View mView;
         public TextView mSubject;
@@ -174,19 +174,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public TextView mSubgroup;
         public TextView mTypeSub;
         public TextView mDayWeek;
-        public TextView today;
+//        public TextView today;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
 
-            mSubject = (TextView) view.findViewById(R.id.subject);
-            mTeachersName = (TextView) view.findViewById(R.id.teachers_name);
-            mCabinet = (TextView) view.findViewById(R.id.number_class);
-            mTime = (TextView) view.findViewById(R.id.time);
-            mTypeSub = (TextView) view.findViewById(R.id.typeSubject);
-            mSubgroup = (TextView) view.findViewById(R.id.subgroups);
-            mDayWeek = (TextView) view.findViewById(R.id.dayWeek);
+            mSubject = view.findViewById(R.id.subject);
+            mTeachersName = view.findViewById(R.id.teachers_name);
+            mCabinet = view.findViewById(R.id.number_class);
+            mTime = view.findViewById(R.id.time);
+            mTypeSub = view.findViewById(R.id.typeSubject);
+            mSubgroup = view.findViewById(R.id.subgroups);
+            mDayWeek = view.findViewById(R.id.dayWeek);
 //            today = (TextView) view.findViewById(R.id.today);
         }
     }

@@ -14,7 +14,9 @@ import android.view.ViewGroup;
 import com.example.my_time_table.MainActivity;
 import com.example.my_time_table.R;
 import com.example.my_time_table.RecyclerAdapter;
-import com.example.my_time_table.database.TimeTableDatabase;
+import com.example.my_time_table.time_table_pojos.PartOfTimeTable;
+
+import java.util.List;
 
 public class ScheduleFragment extends Fragment {
 
@@ -35,16 +37,15 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule_list, container, false);
 
-        MainActivity mainActivity = new MainActivity();
-        TimeTableDatabase ttb = TimeTableDatabase.getDatabase(mainActivity.getMainContext());
-
         // Устанавливаем адаптер.
+
+        List<PartOfTimeTable> value = MainActivity.getWeek1();
+
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new RecyclerAdapter(ttb.timeTableDao().LoadAllPartOfTimeTable(), null));
-//            MainActivity.scrollToItem();
+            recyclerView.setAdapter(new RecyclerAdapter(value, null));
         }
         return view;
     }

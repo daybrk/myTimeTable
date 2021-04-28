@@ -1,5 +1,6 @@
 package com.example.my_time_table.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -16,37 +17,35 @@ import java.util.List;
 public interface TimeTableDAO {
 
     @Query("SELECT * FROM PartOfTimeTable")
-    public List<PartOfTimeTable> LoadAllPartOfTimeTable();
+    LiveData<List<PartOfTimeTable>> LoadAllPartOfTimeTable();
 
-    @Query("SELECT * FROM PartOfTimeTable WHERE id_Part = :id")
-    public PartOfTimeTable getById1Week(long id);
+    @Query("DELETE FROM PartOfTimeTable")
+    void deleteWeek1();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertPartOfTimeTable(PartOfTimeTable partOfTimeTable);
+    void insertPartOfTimeTable(PartOfTimeTable partOfTimeTable);
 
 
 
     @Query("SELECT * FROM TimeTableWeek2")
-    public List<TimeTableWeek2> LoadAllTimeTableWeek2();
+    LiveData<List<TimeTableWeek2>> LoadAllTimeTableWeek2();
 
-    @Query("SELECT * FROM TimeTableWeek2 WHERE id_Part = :id")
-    public PartOfTimeTable getById2Week(long id);
+    @Query("DELETE FROM TimeTableWeek2")
+    void deleteWeek2();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertTimeTableWeek2(TimeTableWeek2 timeTableWeek2);
+    void insertTimeTableWeek2(TimeTableWeek2 timeTableWeek2);
+
 
 
 
     @Query("SELECT * FROM CheckDay")
-    public List<CheckDay> LoadAllDaysNumber();
-
-    @Query("SELECT * FROM CheckDay WHERE id = :id")
-    public CheckDay getByIdDay(long id);
+    LiveData<List<CheckDay>> LoadAllDaysNumber();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertDaysNumber(CheckDay checkDay);
+    void insertDaysNumber(CheckDay checkDay);
 
     @Delete
-    public void delete(CheckDay checkDay);
+    void delete(CheckDay checkDay);
 
 }
