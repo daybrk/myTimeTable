@@ -19,7 +19,8 @@
     <item android:height="100dp">
         <shape
             android:shape="line">
-            <stroke android:width="3dp" android:color="#FFFFFF" />
+            <stroke android:width="3dp"
+                android:color="#FFFFFF" />
         </shape>
     </item>
 

@@ -2,6 +2,7 @@ package com.example.my_time_table;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
@@ -11,8 +12,13 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.my_time_table.fragments.ScheduleFragment;
@@ -34,13 +40,13 @@ public class MainActivity extends AppCompatActivity {
     static ViewPager2 viewPager2;
     private static TextView weeklyNumber;
     private TextView numberDay;
-    private TextView weekDay;
+    private static TextView weekDay;
 
     private static SharedPreferences sharedPreferences;
     static FragmentManager fragmentManager;
     static Lifecycle lifecycle;
 
-    // Кл-во листаемых страниц
+    // Кл-во листаемых страниц 
     private static final int NUM_PAGES = 2;
 
     // Хранит версию локальной (room) БД
@@ -119,6 +125,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        ConstraintLayout constraintLayout = findViewById(R.id.constraint);
+        switch(id){
+            case R.id.white:
+                constraintLayout.setBackgroundColor(Color.WHITE);
+                weeklyNumber.setTextColor(Color.BLACK);
+                weekDay.setTextColor(Color.BLACK);
+                numberDay.setTextColor(Color.BLACK);
+                return true;
+            case R.id.black:
+                constraintLayout.setBackgroundColor(Color.parseColor("#434343"));
+                weeklyNumber.setTextColor(Color.parseColor("#E6E6E6"));
+                weekDay.setTextColor(Color.parseColor("#E6E6E6"));
+                numberDay.setTextColor(Color.parseColor("#E6E6E6"));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     void createScreenSlide() {
         // Создаём pageAdapter и запускаем viewPager
         Log.i("LiveDataSize", "Запуск viewpager");
@@ -139,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
             // Создаём фрагмент
             switch (position) {
                 case 0:
-                    Log.i("LiveDataSize", "size перед запуском " + week1.size());
                     return new ScheduleFragment();
                 case 1:
                     return new ScheduleFragment2();
@@ -152,32 +184,37 @@ public class MainActivity extends AppCompatActivity {
 
             switch (position) {
                 case 0:
-                    try {
+//                    try {
                         // Автопролистывание
-                        ScheduleFragment.getRecyclerView().post(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (int i = 1; i < DataFromFB.getNextDay1().size(); i++) {
-//                                    if (weekDay.getText()
-//                                            .equals(ttb.timeTableDao()
-//                                                    .getById1Week(nextDay1.get(i) + 1).getDay())) {
-//                                        ScheduleFragment.getRecyclerView()
-//                                                .smoothScrollToPosition(nextDay1.get(i) + 2);
-//                                    }
-//                                    if (weekDay.getText()
-//                                            .equals(week1.get(nextDay1.get(i) + 1).getDay())) {
-//                                        ScheduleFragment.getRecyclerView()
-//                                                .smoothScrollToPosition(nextDay1.get(i) + 2);
-//                                    }
-                                }
-                            }
-                        });
-                    } catch (Exception ignore) {
-
-                    }
+//                        ScheduleFragment.getRecyclerView().post(() -> {
+//                            for (int i = 1; i < DataFromFB.getNextDay1().size() - 1; i++) {
+//                                if (weekDay.getText()
+//                                        .equals(week1.get(DataFromFB.getNextDay1().get(i)).getDay())) {
+//                                    ScheduleFragment.getRecyclerView()
+//                                            .smoothScrollToPosition(DataFromFB.getNextDay1().get(i) + 2);
+//                                }
+//                            }
+//                        });
+//                    } catch (Exception ignore) {
+//
+//                    }
                     weeklyNumber.setText(String.valueOf(position + 1));
 
                 case 1:
+//                    try {
+//                        // Автопролистывание
+//                        ScheduleFragment2.getRecyclerView().post(() -> {
+//                            for (int i = 1; i < DataFromFB.getNextDay2().size() - 1; i++) {
+//                                if (weekDay.getText()
+//                                        .equals(week2.get(DataFromFB.getNextDay2().get(i)).getDay())) {
+//                                    ScheduleFragment2.getRecyclerView()
+//                                            .smoothScrollToPosition(DataFromFB.getNextDay2().get(i) + 2);
+//                                }
+//                            }
+//                        });
+//                    } catch (Exception ignore) {
+//
+//                    }
                     // С пролистыванием, меняем значение недели.
                     weeklyNumber.setText(String.valueOf(position + 1));
                     break;

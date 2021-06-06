@@ -31,6 +31,7 @@ public class SetLifecycle implements LifecycleObserver, LifecycleOwner {
                 partOfTimeTables -> MainActivity.setWeek1(partOfTimeTables));
         MainActivity.getViewModel().getAllWeek2().observe(this, timeTableWeek2s -> {
             MainActivity.setWeek2(timeTableWeek2s);
+            // Ждём пока liveData полностью обновится, после чего запускаем фрагменты
             if (timeTableWeek2s.size() == DataFromFB.getStart2()) {
                 MainActivity mainActivity = new MainActivity();
                 mainActivity.createScreenSlide();
