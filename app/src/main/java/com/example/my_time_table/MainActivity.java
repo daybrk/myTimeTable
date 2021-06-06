@@ -12,12 +12,14 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -57,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
     private static List<TimeTableWeek2> week2;
     private static List<CheckDay> check;
 
+    private static Fragment shFrag = new ScheduleFragment();
+    private static Fragment shFrag2 = new ScheduleFragment2();
+
+    public Boolean landOrientation = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
         weekDay = findViewById(R.id.weekday);
         weeklyNumber = findViewById(R.id.weekly_number);
 
-        // Задаём номер начальное недели
-        weeklyNumber.setText("1");
+
 
         // Текущее время
         Date currentDate = new Date();
@@ -119,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             case "суббота":
                 weekDay.setText("Суббота");
                 break;
-            case "воскресенье":
+            case "всЕЕ":
                 weekDay.setText("Воскресенье");
                 break;
         }
@@ -155,8 +161,21 @@ public class MainActivity extends AppCompatActivity {
     void createScreenSlide() {
         // Создаём pageAdapter и запускаем viewPager
         Log.i("LiveDataSize", "Запуск viewpager");
-        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(fragmentManager, lifecycle);
-        viewPager2.setAdapter(pagerAdapter);
+        try {
+            // Задаём номер начальное недели
+            weeklyNumber.setText("1");
+            FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(fragmentManager, lifecycle);
+            viewPager2.setAdapter(pagerAdapter);
+        } catch (NullPointerException e) {
+            weeklyNumber.setText(R.string.week_2);
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fr_cont1, shFrag)
+                    .commit();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fr_cont2, shFrag2)
+                    .commit();
+        }
+
     }
 
 
@@ -172,9 +191,9 @@ public class MainActivity extends AppCompatActivity {
             // Создаём фрагмент
             switch (position) {
                 case 0:
-                    return new ScheduleFragment();
+                    return shFrag;
                 case 1:
-                    return new ScheduleFragment2();
+                    return shFrag2;
             }
             return null;
         }

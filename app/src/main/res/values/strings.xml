@@ -5,4 +5,8 @@
 
     <string name="white_them">Смешанная тема</string>
     <string name="black_them">Чёрная тема</string>
+
+    <string name="week_1">1 Неделя</string>
+    <string name="week_2">2 Неделя</string>
+
 </resources>

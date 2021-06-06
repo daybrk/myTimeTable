@@ -99,7 +99,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
         android:layout_marginLeft="7dp"
-        android:layout_marginTop="2dp"
         android:background="#565555"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textColor="#CCCCCC"

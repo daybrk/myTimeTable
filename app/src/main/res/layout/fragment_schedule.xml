@@ -23,7 +23,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/typeSubject"
-        app:srcCompat="@drawable/line" />
+        app:srcCompat="@drawable/line"
+        android:contentDescription="TODO" />
 
     <TextView
         android:id="@+id/time"
@@ -98,7 +99,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="7dp"
         android:layout_marginLeft="7dp"
-        android:layout_marginTop="2dp"
         android:background="#565555"
         android:textAppearance="?attr/textAppearanceListItem"
         android:textColor="#CCCCCC"
